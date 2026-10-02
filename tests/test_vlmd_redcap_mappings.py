@@ -328,6 +328,29 @@ def test_map_checkbox_with_error():
                 },
             },
         ),
+        (
+            # REDCap leaves "Text Validation Type OR Show Slider Number"
+            # blank for the default visual-analog slider (no numeric
+            # readout) - that's the normal case, not missing/invalid data,
+            # and must not raise.
+            {
+                "name": "blank_validation_type",
+                "text_valid_slider_num": "",
+            },
+            {
+                "type": "integer",
+                "constraints": {"minimum": 0, "maximum": 100},
+            },
+        ),
+        (
+            # Same as above when the column is absent from the row dict
+            # entirely rather than present-but-empty.
+            {"name": "missing_validation_type_key"},
+            {
+                "type": "integer",
+                "constraints": {"minimum": 0, "maximum": 100},
+            },
+        ),
     ],
 )
 def test_map_slider(input_dict, expected_output_dict):
@@ -355,6 +378,14 @@ def test_map_slider(input_dict, expected_output_dict):
                 "text_valid_max": "foo",
             },
             "Skipping non-numeric max value 'foo' for row 'invalid number'",
+        ),
+        (
+            {
+                "name": "invalid number min",
+                "text_valid_slider_num": "number",
+                "text_valid_min": "foo",
+            },
+            "Skipping non-numeric min value 'foo' for row 'invalid number min'",
         ),
     ],
 )

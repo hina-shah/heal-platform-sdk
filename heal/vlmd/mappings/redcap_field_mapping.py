@@ -365,10 +365,15 @@ def map_slider(field: dict) -> dict:
     min_value = None
     max_value = None
 
-    # Check for any specified min-max overrides
-    text_validation = None
+    # Check for any specified min-max overrides. A blank value here is
+    # REDCap's normal default for a slider (plain 0-100 visual-analog scale,
+    # no numeric readout) rather than missing/ambiguous input, so it must
+    # resolve to a definite string, not None, the same way map_text handles
+    # this same column a few lines up.
     if field.get(TEXT_VALID_FIELD_NAME):
         text_validation = field[TEXT_VALID_FIELD_NAME].lower()
+    else:
+        text_validation = ""
 
     if "number" in text_validation:
         field_type = "number"
@@ -378,7 +383,7 @@ def map_slider(field: dict) -> dict:
                 min_value = float(min_value_input)
             else:
                 message = f"Skipping non-numeric min value '{min_value_input}' for row '{field_name}'"
-                logger.error()
+                logger.error(message)
                 raise ValueError(message)
         max_value_input = field.get("text_valid_max")
         if max_value_input:
